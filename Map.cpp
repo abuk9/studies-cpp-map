@@ -1,6 +1,6 @@
 #include <iostream>
 using namespace std;
-
+#define LOG false
 class KeyError {};
 
 template <class K, class V>
@@ -21,6 +21,15 @@ class Map {
       }
       return NULL;
     };
+    Node* findParent(const K& key) const {
+      if (!data) return NULL;
+      Node* parent = data;
+      while (parent->next) {
+        if (parent->next->key == key) return parent;
+        parent = parent->next;
+      }
+      return NULL;
+    }
 
    public:
     LinkedList(){};
@@ -34,20 +43,19 @@ class Map {
 
     V& get(K key) { return find(key)->value; };
     bool exists(const K& key) const { return find(key) != NULL; };
+    // TODO: protect against inserting a key twice
     void add(K key, V value) { data = new Node{data, key, value}; };
     void del(const K& key) {
-      Node* found = find(key);
-      if (!found) throw KeyError();
-      if (!(found->next)) {
-        delete found;
-        return;
+      if (data->key == key) {
+        Node* temp = data->next;
+        delete data;
+        data = temp;
+      } else {
+        Node* parent = findParent(key);
+        Node* grandChild = parent->next->next;
+        delete parent->next;
+        parent->next = grandChild;
       }
-
-      Node* next = found->next;
-      found->next = next->next;
-      found->key = next->key;
-      found->value = next->value;
-      delete next;
     };
     int length() {
       int count = 0;
@@ -63,15 +71,35 @@ class Map {
  public:
   Map(unsigned size = 1000) : size(size) { data = new LinkedList[size]; };
   ~Map() { delete[] data; };
-  V& find(const K& key) const { return data[0].get(key); }
-  void add(K key, V value) { data[0].add(key, value); };
-  void del(const K& key) { data[0].del(key); };
-  bool exists(K key) const { return data[0].exists(key); };
-  int lengthOf(int id) const { return data[id].length(); }
+  V& find(const K& key) { return data[hash(key)].get(key); }
+  void add(K key, V value) { data[hash(key)].add(key, value); };
+  void del(const K& key) { data[hash(key)].del(key); };
+  bool exists(K key) const { return data[hash(key)].exists(key); };
+  void printStats() {
+    int elements = 0;
+    int hashes = 0;
+    for (int id = 0; id < size; id++) {
+      int howMany = data[id].length();
+      if (howMany) {
+        elements += howMany;
+        hashes++;
+      }
+    }
+    cout << "Computed " << elements << " elements into " << hashes << " hashes."
+         << endl;
+  }
 
  private:
   unsigned size;
-  unsigned hash(K key) const;
+  unsigned noHash(K key) const { return 0; }
+  unsigned modHash(K key) const {
+    unsigned long long* bits = (unsigned long long*)&key;
+    unsigned out = *bits % size;
+    if (LOG) cout << "Hash for " << key << ": " << out << endl;
+    return out;
+  };
+
+  unsigned hash(K key) const { return modHash(key); };
   LinkedList* data;
 };
 
@@ -90,6 +118,6 @@ int main() {
   cout << test.exists(2) << endl;
   test.del(2);
   cout << test.exists(2) << endl;
-  cout << test.lengthOf(0) << endl;
+  test.printStats();
   return 0;
 }
