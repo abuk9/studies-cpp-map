@@ -1,7 +1,13 @@
+#include <bitset>
 #include <iostream>
+#include <sstream>
 #include <string>
 using namespace std;
 #define LOG true
+#define SMALL_PRIME 1289
+#define MID_PRIME 100003
+#define BIG_PRIME 10000019
+
 class KeyError {};
 
 template <class K, class V>
@@ -70,7 +76,9 @@ class Map {
   };
 
  public:
-  Map(unsigned size = 1000) : size(size) { data = new LinkedList[size]; };
+  Map(unsigned size = SMALL_PRIME) : size(size) {
+    data = new LinkedList[size];
+  };
   ~Map() { delete[] data; };
   V& find(const K& key) { return data[hash(key)].get(key); }
   void add(K key, V value) { data[hash(key)].add(key, value); };
@@ -90,6 +98,24 @@ class Map {
          << endl;
   }
 
+  void testRotate() {
+    unsigned toRotate = 0xff0000fe;
+    const size_t s = sizeof(unsigned) * 8;
+    bitset<s> org = toRotate;
+    bitset<s> rot0 = rotate(toRotate, 0);
+    bitset<s> rot2 = rotate(toRotate, 2);
+    bitset<s> rot3 = rotate(toRotate, 3);
+    bitset<s> rot9 = rotate(toRotate, 9);
+    bitset<s> rot13 = rotate(toRotate, 13);
+
+    cout << " (x): " << org << endl;
+    cout << " (0): " << rot0 << endl;
+    cout << " (2): " << rot2 << endl;
+    cout << " (3): " << rot3 << endl;
+    cout << " (9): " << rot9 << endl;
+    cout << "(13): " << rot13 << endl;
+  }
+
  private:
   unsigned size;
   unsigned noHash(K key) const { return 0; }
@@ -100,7 +126,38 @@ class Map {
     return out;
   };
 
-  unsigned hash(K key) const { return noHash(key); };
+  static string toString(K data) {
+    ostringstream stream;
+    stream << data;
+    return stream.str();
+  }
+
+  unsigned strHash(K key) const {
+    string data = toString(key);
+    unsigned hash = 0;
+    for (long unsigned id = 0; id < data.length(); id++) {
+      hash += data[id] * 3 * (id + 1);
+    }
+    return hash % size;
+  }
+
+  static unsigned rotate(unsigned num, int bits) {
+    unsigned msb = num << bits;
+    unsigned lsb = num >> (sizeof(unsigned) * 8 - bits);
+    return msb | lsb;
+  }
+
+  unsigned xorHash(K key) const {
+    unsigned hash = 0;
+    string data = toString(key);
+    for (char c : data) {
+      hash = rotate(hash, 3);
+      hash = hash ^ c;
+    }
+    return hash % size;
+  }
+
+  unsigned hash(K key) const { return xorHash(key); };
   LinkedList* data;
 };
 
@@ -130,6 +187,11 @@ void testStringKeys() {
   test.add("Test", 1.1);
   test.add("Testt", 1.1);
   test.printStats();
+}
+
+void testRotate() {
+  Map<int, int> m;
+  m.testRotate();
 }
 
 int main() {
