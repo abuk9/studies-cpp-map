@@ -53,7 +53,7 @@ class Map {
       if (!val) throw NoSuchKeyError();
       return val->value;
     };
-    
+
     bool exists(const K& key) const { return find(key) != NULL; };
     void add(K key, V value) {
       if (exists(key)) throw KeyExistsError();
@@ -201,10 +201,4 @@ void testStringKeys() {
 void testRotate() {
   Map<int, int> m;
   m.testRotate();
-}
-
-int main() {
-  testIntKeys();
-  testStringKeys();
-  return 0;
 }

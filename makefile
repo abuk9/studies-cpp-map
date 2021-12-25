@@ -1,5 +1,5 @@
-# headers = Map.h
-sources = Map.cpp
+headers = Map.h
+sources = TestMap.cpp
 out = TestMap
 flags = -Wall -pedantic
 
