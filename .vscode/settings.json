@@ -3,6 +3,9 @@
         "*.tcc": "cpp",
         "fstream": "cpp",
         "sstream": "cpp",
-        "streambuf": "cpp"
+        "streambuf": "cpp",
+        "optional": "cpp",
+        "numeric": "cpp",
+        "cmath": "cpp"
     }
 }

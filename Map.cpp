@@ -1,6 +1,7 @@
 #include <iostream>
+#include <string>
 using namespace std;
-#define LOG false
+#define LOG true
 class KeyError {};
 
 template <class K, class V>
@@ -59,10 +60,10 @@ class Map {
     };
     int length() {
       int count = 0;
-      while (data != NULL) {
-        Node* next = data->next;
+      Node* itr = data;
+      while (itr != NULL) {
         count++;
-        data = next;
+        itr = itr->next;
       }
       return count;
     }
@@ -78,7 +79,7 @@ class Map {
   void printStats() {
     int elements = 0;
     int hashes = 0;
-    for (int id = 0; id < size; id++) {
+    for (int id = 0; id < (int)size; id++) {
       int howMany = data[id].length();
       if (howMany) {
         elements += howMany;
@@ -99,11 +100,11 @@ class Map {
     return out;
   };
 
-  unsigned hash(K key) const { return modHash(key); };
+  unsigned hash(K key) const { return noHash(key); };
   LinkedList* data;
 };
 
-int main() {
+void testIntKeys() {
   Map<int, double> test;
   test.add(1, 1.1);
   test.add(2, 2.2);
@@ -119,5 +120,20 @@ int main() {
   test.del(2);
   cout << test.exists(2) << endl;
   test.printStats();
+}
+
+void testStringKeys() {
+  Map<string, double> test;
+  test.add("A test", 1.1);
+  test.add("Another test", 1.1);
+  test.add("Just a dumb test", 1.1);
+  test.add("Test", 1.1);
+  test.add("Testt", 1.1);
+  test.printStats();
+}
+
+int main() {
+  testIntKeys();
+  testStringKeys();
   return 0;
 }
