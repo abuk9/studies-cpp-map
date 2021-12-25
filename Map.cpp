@@ -8,8 +8,8 @@ using namespace std;
 #define MID_PRIME 100003
 #define BIG_PRIME 10000019
 
-class KeyError {};
-
+class KeyExistsError {};
+class NoSuchKeyError {};
 template <class K, class V>
 class Map {
   class LinkedList {
@@ -48,11 +48,20 @@ class Map {
       }
     };
 
-    V& get(K key) { return find(key)->value; };
+    V& get(K key) {
+      Node* val = find(key);
+      if (!val) throw NoSuchKeyError();
+      return val->value;
+    };
+    
     bool exists(const K& key) const { return find(key) != NULL; };
-    // TODO: protect against inserting a key twice
-    void add(K key, V value) { data = new Node{data, key, value}; };
+    void add(K key, V value) {
+      if (exists(key)) throw KeyExistsError();
+      data = new Node{data, key, value};
+    };
+
     void del(const K& key) {
+      if (!exists(key)) return;
       if (data->key == key) {
         Node* temp = data->next;
         delete data;
