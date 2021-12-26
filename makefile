@@ -1,4 +1,4 @@
-headers = Map.h
+headers = Map.h Employee.h
 sources = TestMap.cpp
 out = TestMap
 flags = -Wall -pedantic

@@ -1,4 +1,5 @@
 #include <iostream>
+using namespace std;
 
 class Employee {
  public:
@@ -11,5 +12,6 @@ class Employee {
 };
 
 ostream& operator<<(ostream& out, const Employee& e) {
-  out << e.name << ", age " << e.age << " - " << e.position << endl;
-};
+  out << e.name << ", age " << e.age << " - " << e.position;
+  return out;
+}

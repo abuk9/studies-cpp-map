@@ -6,6 +6,7 @@
         "streambuf": "cpp",
         "optional": "cpp",
         "numeric": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "ostream": "cpp"
     }
 }

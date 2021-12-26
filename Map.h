@@ -82,6 +82,16 @@ class Map {
       }
       return count;
     }
+
+    friend ostream& operator<<(ostream& out, LinkedList& list) {
+      Node* itr = list.data;
+      while (itr != NULL) {
+        out << itr->key << ": ";
+        out << itr->value << endl;
+        itr = itr->next;
+      }
+      return out;
+    }
   };
 
  public:
@@ -107,6 +117,13 @@ class Map {
          << endl;
   }
 
+  friend ostream& operator<<(ostream& out, Map<K, V>& m) {
+    for (unsigned id = 0; id < m.size; id++) {
+      out << m.data[id];
+    }
+    return out;
+  }
+
   void testRotate() {
     unsigned toRotate = 0xff0000fe;
     const size_t s = sizeof(unsigned) * 8;
@@ -126,6 +143,7 @@ class Map {
   }
 
  private:
+  LinkedList* data;
   unsigned size;
   unsigned noHash(K key) const { return 0; }
   unsigned modHash(K key) const {
@@ -167,38 +185,4 @@ class Map {
   }
 
   unsigned hash(K key) const { return xorHash(key); };
-  LinkedList* data;
 };
-
-void testIntKeys() {
-  Map<int, double> test;
-  test.add(1, 1.1);
-  test.add(2, 2.2);
-  test.add(3, 3.3);
-  test.add(4, 4.4);
-
-  cout << test.find(1) << endl;
-  cout << test.find(2) << endl;
-  cout << test.find(3) << endl;
-  cout << test.find(4) << endl;
-
-  cout << test.exists(2) << endl;
-  test.del(2);
-  cout << test.exists(2) << endl;
-  test.printStats();
-}
-
-void testStringKeys() {
-  Map<string, double> test;
-  test.add("A test", 1.1);
-  test.add("Another test", 1.1);
-  test.add("Just a dumb test", 1.1);
-  test.add("Test", 1.1);
-  test.add("Testt", 1.1);
-  test.printStats();
-}
-
-void testRotate() {
-  Map<int, int> m;
-  m.testRotate();
-}
