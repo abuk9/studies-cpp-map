@@ -4,12 +4,14 @@
 #include <string>
 using namespace std;
 #define LOG true
+#define TINY_PRIME 13
 #define SMALL_PRIME 1289
 #define MID_PRIME 100003
 #define BIG_PRIME 10000019
 
 class KeyExistsError {};
 class NoSuchKeyError {};
+
 template <class K, class V>
 class Map {
   class LinkedList {
@@ -38,15 +40,39 @@ class Map {
       return NULL;
     }
 
-   public:
-    LinkedList(){};
-    ~LinkedList() {
+    void deallocate() {
       while (data != NULL) {
         Node* next = data->next;
         delete data;
         data = next;
       }
-    };
+    }
+
+   public:
+    LinkedList(){};
+    LinkedList(const LinkedList& source) {
+      Node* itr = source.data;
+      if (itr)
+        data = new Node{NULL, itr->key, itr->value};
+      else
+        return;
+
+      Node* thisItr = data;
+      while (itr->next != NULL) {
+        itr = itr->next;
+        thisItr->next = new Node{NULL, itr->key, itr->value};
+        thisItr = thisItr->next;
+      }
+    }
+
+    LinkedList& operator=(const LinkedList& source) {
+      if (this == &source) return *this;
+      deallocate();
+      data = source.data;
+      return *this;
+    }
+
+    ~LinkedList() { deallocate(); };
 
     V& get(K key) {
       Node* val = find(key);
@@ -95,9 +121,20 @@ class Map {
   };
 
  public:
-  Map(unsigned size = SMALL_PRIME) : size(size) {
+  Map(unsigned size = TINY_PRIME) : size(size) { data = new LinkedList[size]; };
+  Map(const Map& source) {
+    size = source.size;
     data = new LinkedList[size];
-  };
+    for (unsigned id = 0; id < size; id++) {
+      data[id] = LinkedList(source.data[id]);
+    }
+  }
+  Map& operator=(const Map& source) {
+    if (this == &source) return *this;
+    delete[] data;
+    data = source.data;
+    return *this;
+  }
   ~Map() { delete[] data; };
   V& find(const K& key) { return data[hash(key)].get(key); }
   void add(K key, V value) { data[hash(key)].add(key, value); };
@@ -142,7 +179,7 @@ class Map {
     cout << "(13): " << rot13 << endl;
   }
 
- private:
+  //  private:
   LinkedList* data;
   unsigned size;
   unsigned noHash(K key) const { return 0; }
