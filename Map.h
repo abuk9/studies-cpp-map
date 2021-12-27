@@ -48,9 +48,7 @@ class Map {
       }
     }
 
-   public:
-    LinkedList(){};
-    LinkedList(const LinkedList& source) {
+    void copyConstructor(const LinkedList& source) {
       Node* itr = source.data;
       if (itr)
         data = new Node{NULL, itr->key, itr->value};
@@ -65,10 +63,13 @@ class Map {
       }
     }
 
+   public:
+    LinkedList(){};
+    LinkedList(const LinkedList& source) { copyConstructor(source); }
+
     LinkedList& operator=(const LinkedList& source) {
-      if (this == &source) return *this;
-      deallocate();
-      data = source.data;
+      if (this != &source) deallocate();
+      copyConstructor(source);
       return *this;
     }
 
@@ -122,17 +123,10 @@ class Map {
 
  public:
   Map(unsigned size = TINY_PRIME) : size(size) { data = new LinkedList[size]; };
-  Map(const Map& source) {
-    size = source.size;
-    data = new LinkedList[size];
-    for (unsigned id = 0; id < size; id++) {
-      data[id] = LinkedList(source.data[id]);
-    }
-  }
+  Map(const Map& source) { copyConstructor(source); }
   Map& operator=(const Map& source) {
-    if (this == &source) return *this;
-    delete[] data;
-    data = source.data;
+    if (this != &source) delete[] data;
+    copyConstructor(source);
     return *this;
   }
   ~Map() { delete[] data; };
@@ -179,7 +173,7 @@ class Map {
     cout << "(13): " << rot13 << endl;
   }
 
-  //  private:
+ private:
   LinkedList* data;
   unsigned size;
   unsigned noHash(K key) const { return 0; }
@@ -222,4 +216,12 @@ class Map {
   }
 
   unsigned hash(K key) const { return xorHash(key); };
+
+  void copyConstructor(const Map& source) {
+    size = source.size;
+    data = new LinkedList[size];
+    for (unsigned id = 0; id < size; id++) {
+      data[id] = LinkedList(source.data[id]);
+    }
+  }
 };

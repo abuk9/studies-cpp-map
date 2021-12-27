@@ -9,8 +9,8 @@ typedef Map<ID, Employee> Database;
 
 void addEmployees(Database& database) {
   database.add(761028073, Employee("Jan Kowalski", "salesman", 28));
-  // database.add(510212881, Employee("Adam Nowak", "storekeeper", 54));
-  // database.add(730505129, Employee("Anna Zaradna", "secretary", 32));
+  database.add(510212881, Employee("Adam Nowak", "storekeeper", 54));
+  database.add(730505129, Employee("Anna Zaradna", "secretary", 32));
 }
 
 void modifyEmployees(Database& database) {
@@ -27,25 +27,16 @@ void modifyEmployees(Database& database) {
 void defaultTest() {
   Database database;
   addEmployees(database);
-  // unsigned h1 = database.hash(761028073);
-  // cout << "Hash 1: " << h1 << endl;
-  // cout << "Original database:" << endl << database;
-  // database.printStats();
+  cout << "Original database:" << endl << database << endl;
 
-  // cout << endl;
   Database newDatabase = database;
-  // unsigned h2 = newDatabase.hash(132714512);
-  // cout << "Hash 2: " << h2 << endl;
-  // cout << "Copy:" << endl << newDatabase;
-  // cout << "Entry 0: " << newDatabase.data[0] << endl;
-  // newDatabase.printStats();
-  // Employee e("Ewa Nowak", "charwoman", 42);
-  // newDatabase.add(830505432, e);
-  // modifyEmployees(newDatabase);
-  // cout << "Modified database:" << endl << newDatabase << endl;
+  Employee e("Ewa Nowak", "charwoman", 42);
+  newDatabase.add(830505432, e);
+  modifyEmployees(newDatabase);
+  cout << "Modified database:" << endl << newDatabase << endl;
 
-  // database = newDatabase;
-  // cout << "Database after the assignment:" << endl << database << endl;
+  database = newDatabase;
+  cout << "Database after the assignment:" << endl << database << endl;
 }
 
 void testIntKeys() {
@@ -113,8 +104,12 @@ void testEdgeCases() {
 }
 
 int main() {
-  // testIntKeys();
-  // testStringKeys();
-  // testEdgeCases();
+  // THINGS TO ASK:
+  // - assignment/copy constructor
+  // - how to test private functions?
+
+  testIntKeys();
+  testStringKeys();
+  testEdgeCases();
   defaultTest();
 }
